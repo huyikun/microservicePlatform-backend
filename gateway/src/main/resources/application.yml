@@ -1,0 +1,39 @@
+server:
+  port: 9527
+
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启从注册中心动态创建路由的功能，利用微服务名进行路由"
+      routes:
+        - id: usermanaging
+#          uri: http://localhost:8002
+          uri: lb://usermanaging
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+
+        - id: security
+          uri: lb://security
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+eureka:
+  instance:
+    hostname: cloud-gateway-service
+    prefer-ip-address: true
+    instance-id: localhost:9527
+  client:
+    service-url:
+      register-with-eureka: true
+      fetch-registry: true
+      defaultZone: http://localhost:8001/eureka/
+
+
+
